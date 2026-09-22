@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Gemini Code Power Studio</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{--bg:#0b0d10;--panel:#111419;--panel2:#171a20;--panel3:#1d2129;--border:#292e38;--text:#f1f3f5;--muted:#9299a6;--accent:#8ab4f8;--accent2:#6ea8fe;--danger:#ff6b6b;--success:#67d391;--radius:16px;--shadow:0 12px 40px rgba(0,0,0,.28);--composer-space:275px}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{overflow:hidden;overscroll-behavior:none}
+button,select,textarea,input{font:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.material-symbols-rounded{font-family:"Material Symbols Rounded";font-weight:400;font-style:normal;font-size:20px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:"liga";-webkit-font-smoothing:antialiased;font-feature-settings:"liga";font-variation-settings:"FILL" 0,"wght" 500,"GRAD" 0,"opsz" 24}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.app{width:100%;height:100dvh;display:flex;overflow:hidden;min-width:0}
+.sidebar{width:280px;flex:0 0 280px;height:100%;background:#0d0f13;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:14px;gap:12px;z-index:40}
+.brand{display:flex;align-items:center;gap:10px;padding:8px 4px 14px}
+.brand-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#4285f4,#9b72cb);font-size:20px;box-shadow:0 8px 22px rgba(66,133,244,.2);flex:0 0 38px}
+.brand-title{font-weight:700;font-size:15px}.brand-sub{color:var(--muted);font-size:11px;margin-top:2px}
+.new-chat{width:100%;height:44px;border:1px solid var(--border);border-radius:12px;background:var(--panel2);color:var(--text);font-weight:600;display:flex;align-items:center;justify-content:center;gap:7px}
+.new-chat:hover{background:var(--panel3)}
+.sidebar-section{margin-top:5px}.sidebar-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:#707784;padding:8px}.chat-list{overflow:auto;flex:1;min-height:0;scrollbar-width:thin}.chat-item{width:100%;border:0;background:transparent;color:#c8ccd4;padding:10px;text-align:left;border-radius:10px;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chat-item:hover,.chat-item:focus-visible{background:var(--panel2)}
+.sidebar-bottom{border-top:1px solid var(--border);padding-top:10px}
+.api-status{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);padding:8px;min-height:32px}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#666;flex:0 0 7px}.status-dot.ok{background:var(--success);box-shadow:0 0 10px rgba(103,211,145,.55)}.status-dot.error{background:var(--danger)}
+.sidebar-backdrop{display:none}
+.main{min-width:0;flex:1;height:100%;display:flex;flex-direction:column;position:relative}
+.topbar{min-height:62px;height:62px;flex:0 0 auto;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--border);background:rgba(11,13,16,.92);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);z-index:20;gap:10px}
+.top-left,.top-right{display:flex;align-items:center;gap:8px;min-width:0}.top-left{flex:1 1 auto;overflow-x:auto;scrollbar-width:none}.top-left::-webkit-scrollbar,.top-right::-webkit-scrollbar{display:none}.top-right{flex:0 0 auto}
+.mobile-menu{display:none}
+.model-select,.thinking-select,.mode-select{height:36px;background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:0 10px;outline:none;max-width:210px;min-width:0}.thinking-select{min-width:145px}.model-select:focus,.thinking-select:focus,.mode-select:focus{border-color:#4d6f9e}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;flex:0 0 36px;border:1px solid var(--border);border-radius:10px;background:var(--panel2);color:#cbd0d9;padding:0}.icon-btn:hover{background:var(--panel3)}
+.chat{flex:1;min-height:0;overflow-y:auto;scroll-behavior:smooth;padding:24px 20px calc(var(--composer-space) + 28px);scrollbar-width:thin;scroll-padding-bottom:var(--composer-space)}
+.chat-inner{width:min(100%,980px);margin:0 auto}
+.welcome{min-height:calc(100dvh - 250px);display:flex;align-items:center;justify-content:center}
+.welcome-card{width:min(720px,100%);text-align:center}.welcome-logo{width:58px;height:58px;margin:0 auto 18px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#4285f4,#a66cff);font-size:28px;box-shadow:0 18px 45px rgba(70,110,255,.2)}
+.welcome h1{margin:0 0 10px;font-size:clamp(25px,5vw,38px);letter-spacing:-.04em}.welcome p{color:var(--muted);margin:0 auto;max-width:600px;line-height:1.6}
+.suggestions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:30px}.suggestion{text-align:left;padding:14px;border-radius:14px;background:var(--panel);border:1px solid var(--border);color:#cdd2db}.suggestion:hover{background:var(--panel2)}.suggestion strong{display:block;color:#f4f5f7;margin-bottom:4px}
+.message{display:flex;gap:12px;margin:0 auto 26px}.message.user{justify-content:flex-end}.avatar{width:32px;height:32px;flex:0 0 32px;border-radius:10px;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--panel3);border:1px solid var(--border)}.message.user .avatar{order:2}
+.message-body{min-width:0;max-width:calc(100% - 50px)}.message.user .message-body{max-width:min(850px,90%)}.message-text{line-height:1.65;color:#e6e8ec;overflow-wrap:anywhere}.message.user .message-text{background:#1a1f27;border:1px solid var(--border);padding:12px 15px;border-radius:17px}.thinking{color:#8d96a4;font-size:12px;padding:5px 0 10px}
+.code-wrap{margin-top:12px;border:1px solid var(--border);border-radius:13px;overflow:hidden;background:#080a0d}.code-head{min-height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;background:#111419;border-bottom:1px solid var(--border);gap:8px}.code-lang{color:#9da5b2;font-size:11px;font-family:"Roboto Mono",ui-monospace,monospace}.code-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.code-action{border:1px solid var(--border);background:#171a20;color:#bfc5cf;border-radius:7px;padding:4px 8px;font-size:11px}.code-action:hover{background:#222731}
+pre{margin:0;overflow:auto;padding:15px;max-height:620px}code{font-family:"Roboto Mono","SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:13px;line-height:1.6;white-space:pre}.inline-code{background:#20242c;border-radius:5px;padding:2px 5px;font-family:"Roboto Mono",monospace}
+.composer-zone{position:absolute;bottom:0;left:0;right:0;padding:14px 20px calc(18px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,transparent,rgba(11,13,16,.96) 24%);pointer-events:none;z-index:15;overflow:visible}
+.composer{pointer-events:auto;width:min(100%,980px);margin:0 auto;background:#15181e;border:1px solid #303640;border-radius:18px;box-shadow:var(--shadow);overflow:auto;max-height:min(46dvh,430px);overscroll-behavior:contain}
+.editor-tabs{display:flex;align-items:center;gap:5px;padding:7px 9px 0;position:sticky;top:0;background:#15181e;z-index:2}.tab{border:0;background:transparent;color:#808896;padding:7px 9px;border-radius:8px;font-size:11px}.tab.active{color:#e5e8ed;background:#20242b}
+.code-input-wrap{position:relative}#codeInput{display:block;width:100%;height:112px;resize:vertical;min-height:72px;max-height:25dvh;border:0;outline:none;background:transparent;color:#dfe3e8;padding:12px 15px 4px;font-family:"Roboto Mono","SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;font-size:13px;line-height:1.55;tab-size:2}.#codeInput::placeholder{color:#666e7b}
+#codeInput::placeholder{color:#666e7b}.prompt-input{display:block;width:100%;min-height:54px;max-height:125px;resize:none;border:0;outline:none;background:transparent;color:var(--text);padding:12px 15px;line-height:1.5}
+.composer-bottom{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px 9px;border-top:1px solid #252a32;position:sticky;bottom:0;background:#15181e;z-index:2}.composer-left,.composer-right{display:flex;align-items:center;gap:7px;min-width:0}.composer-left{flex:1 1 auto}.composer-right{flex:0 0 auto}
+.small-btn{height:32px;padding:0 9px;border:1px solid var(--border);border-radius:9px;background:#1c2027;color:#aeb5c0;font-size:11px;display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}.small-btn:hover{background:#252a32;color:#fff}
+.counter{font-size:10px;color:#737b88;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.send-btn{width:38px;height:38px;flex:0 0 38px;border:0;border-radius:11px;background:#f1f3f5;color:#101216;display:grid;place-items:center;font-size:17px;padding:0}.send-btn:hover{background:#fff;transform:translateY(-1px)}.send-btn.stop{background:#ff6b6b;color:#fff}
+.modal{position:fixed;inset:0;display:none;place-items:center;background:rgba(0,0,0,.68);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:100;padding:20px}.modal.open{display:grid}.modal-card{width:min(540px,100%);max-height:90dvh;overflow:auto;background:#15181e;border:1px solid var(--border);border-radius:18px;box-shadow:0 25px 80px rgba(0,0,0,.5)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:17px 18px;border-bottom:1px solid var(--border);gap:10px}.modal-title{font-weight:700}.modal-body{padding:18px}.field{margin-bottom:16px}.field label{display:block;color:#b8bec8;font-size:12px;margin-bottom:7px}.field input,.field textarea,.field select{width:100%;border:1px solid var(--border);background:#0f1216;color:#e9ebef;border-radius:10px;padding:10px 11px;outline:none}.field textarea{min-height:180px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:#4e6f9d}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.primary-btn{border:0;background:#e8eaed;color:#111318;padding:9px 14px;border-radius:9px;font-weight:600}.secondary-btn{border:1px solid var(--border);background:#1a1e25;color:#cbd0d8;padding:9px 14px;border-radius:9px}
+.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);background:#20242b;color:#e9ebef;border:1px solid #353b46;border-radius:10px;padding:10px 14px;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:200;box-shadow:var(--shadow);max-width:min(92vw,480px);text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}
+@media(max-width:800px){
+.sidebar{position:fixed;left:-290px;top:0;bottom:0;transition:left .22s ease;box-shadow:20px 0 60px rgba(0,0,0,.4);z-index:50}.sidebar.open{left:0}.sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.46);opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s ease;z-index:45}.sidebar-backdrop.open{opacity:1;visibility:visible;pointer-events:auto}
+.topbar{height:auto;min-height:96px;flex-wrap:wrap;align-content:center;padding:8px;gap:6px}.top-left,.top-right{width:100%;flex:1 1 100%;overflow-x:auto;scrollbar-width:none;min-width:0}.top-right{justify-content:flex-start}.mobile-menu{display:grid}.model-select{max-width:48vw}.thinking-select{display:block;min-width:135px;max-width:45vw;font-size:11px;padding:0 7px}.mode-select{display:block;flex:1 1 auto;min-width:0;max-width:none}
+.chat{padding:16px 11px calc(var(--composer-space) + 20px)}.message{gap:8px;margin-bottom:21px}.avatar{width:28px;height:28px;flex-basis:28px;border-radius:8px}.message-body{max-width:calc(100% - 40px)}.message.user .message-body{max-width:92%}
+.composer-zone{padding:7px 8px calc(8px + env(safe-area-inset-bottom))}.composer{border-radius:15px;max-height:min(43dvh,360px)}#codeInput{height:94px;min-height:68px;max-height:20dvh}.prompt-input{min-height:50px;max-height:112px}.suggestions{grid-template-columns:1fr}.counter{max-width:34vw}.welcome{min-height:calc(100dvh - 330px)}.code-wrap pre{max-height:480px}
+}
+@media(max-width:500px){
+.topbar{min-height:102px;padding:7px}.top-left,.top-right{gap:5px}.model-select{max-width:47vw;font-size:10px;padding:0 6px}.thinking-select{min-width:0;max-width:43vw;font-size:10px;padding:0 5px}.top-right .icon-btn{width:34px;height:34px;flex-basis:34px}.mode-select{height:34px;font-size:11px}.chat{padding-left:9px;padding-right:9px}.welcome h1{font-size:25px}.welcome p{font-size:13px}.composer{border-radius:14px;max-height:min(42dvh,330px)}#codeInput{height:84px;max-height:18dvh}.composer-bottom{padding:6px 7px 7px}.counter{display:none}.small-btn{padding:0 8px}.send-btn{width:36px;height:36px;flex-basis:36px}.code-action{font-size:10px;padding:4px 7px}.modal{padding:10px}.modal-card{border-radius:14px;max-height:94dvh}.modal-body{padding:15px}
+}
+@media(orientation:landscape) and (max-width:800px){
+.topbar{min-height:78px}.composer{max-height:min(48dvh,320px)}#codeInput{height:76px;max-height:18dvh}.chat{padding-bottom:calc(var(--composer-space) + 14px)}
+}
+@media(prefers-reduced-motion:reduce){
+*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<aside class="sidebar" id="sidebar" aria-label="Conversation sidebar">
+<div class="brand">
+<div class="brand-icon" aria-hidden="true">✦</div>
+<div><div class="brand-title">Gemini Code Studio</div><div class="brand-sub">Power coding assistant</div></div>
+</div>
+
+<button class="new-chat" id="newChatBtn" type="button">
+<span class="material-symbols-rounded" aria-hidden="true">add</span>New chat
+</button>
+
+<div class="sidebar-section"><div class="sidebar-label">Conversations</div></div>
+<div class="chat-list" id="chatList" aria-label="Conversation history"></div>
+
+<div class="sidebar-bottom">
+<div class="api-status" aria-live="polite">
+<span class="status-dot" id="statusDot"></span>
+<span id="statusText">API key not configured</span>
+</div>
+<button class="small-btn" style="width:100%" id="settingsBtn" type="button">
+<span class="material-symbols-rounded" aria-hidden="true">settings</span>Settings
+</button>
+</div>
+</aside>
+
+<div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+<main class="main">
+
+<header class="topbar" aria-label="Studio controls">
+<div class="top-left">
+
+<button class="icon-btn mobile-menu" id="mobileMenuBtn" type="button" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
+<span class="material-symbols-rounded" aria-hidden="true">menu</span>
+</button>
+
+<select class="model-select" id="modelSelect" aria-label="Gemini model" title="Gemini model">
+<option value="gemini-3.8-flash">Gemini 3.8 Flash</option>
+<option value="gemini-3.7-flash">Gemini 3.7 Flash</option>
+<option value="gemini-3.6-flash">Gemini 3.6 Flash</option>
+<option value="gemini-3.5-flash">Gemini 3.5 Flash</option>
+<option value="gemini-3.1-pro-preview">Gemini 3.1 Pro</option>
+<option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite</option>
+<option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+<option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+</select>
+
+<select class="thinking-select" id="thinkingSelect" aria-label="Thinking level" title="Thinking level">
+<option value="low">🧠 Thinking: Low</option>
+<option value="medium" selected>🧠 Thinking: Medium</option>
+<option value="high">🧠 Thinking: High</option>
+</select>
+
+</div>
+
+<div class="top-right">
+
+<select class="mode-select" id="modeSelect" aria-label="Coding mode">
+<option value="generate">Generate</option>
+<option value="modify">Modify</option>
+<option value="debug">Debug</option>
+<option value="refactor">Refactor</option>
+<option value="review">Review</option>
+<option value="explain">Explain</option>
+<option value="optimize">Optimize</option>
+<option value="convert">Convert</option>
+</select>
+
+<button class="icon-btn" id="clearBtn" type="button" title="Clear conversation" aria-label="Clear conversation">
+<span class="material-symbols-rounded" aria-hidden="true">delete_sweep</span>
+</button>
+
+<button class="icon-btn" id="settingsTopBtn" type="button" title="Settings" aria-label="Settings">
+<span class="material-symbols-rounded" aria-hidden="true">settings</span>
+</button>
+
+</div>
+</header>
+
+<section class="chat" id="chat" aria-label="Conversation">
+<div class="chat-inner" id="chatInner">
+
+<div class="welcome" id="welcome">
+<div class="welcome-card">
+<div class="welcome-logo" aria-hidden="true">✦</div>
+<h1>What are we coding?</h1>
+<p>Generate, modify, debug, refactor, review and optimize practically any type of code with Gemini.</p>
+
+<div class="suggestions">
+<button class="suggestion" type="button" data-prompt="Build a production-grade full-stack application. Explain the architecture first, then provide the complete implementation."><strong>Build an application</strong>Start a complete production-grade project.</button>
+<button class="suggestion" type="button" data-prompt="Analyze the supplied code deeply. Find bugs, security problems, performance issues and architectural problems, then provide a corrected version."><strong>Debug my code</strong>Find bugs and provide corrected code.</button>
+<button class="suggestion" type="button" data-prompt="Refactor the supplied code for production use. Preserve behavior while improving architecture, maintainability, performance, security and error handling."><strong>Refactor code</strong>Upgrade existing code without unnecessary changes.</button>
+<button class="suggestion" type="button" data-prompt="Perform a deep engineering review of the supplied code. Identify correctness, security, performance, scalability and maintainability issues."><strong>Review code</strong>Perform a serious engineering review.</button>
+</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<div class="composer-zone">
+<div class="composer" id="composer">
+
+<div class="editor-tabs">
+<button class="tab active" id="codeTab" type="button">Code</button>
+<button class="tab" id="textTab" type="button">Text</button>
+<button class="tab" id="fileTab" type="button">File</button>
+</div>
+
+<div class="code-input-wrap">
+<textarea id="codeInput" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" aria-label="Code or text input" placeholder="Paste your code here — up to 80,000 lines."></textarea>
+<input id="fileInput" type="file" hidden multiple>
+</div>
+
+<textarea id="promptInput" class="prompt-input" rows="1" aria-label="Task description" placeholder="Describe what you want Gemini to do with the code..."></textarea>
+
+<div class="composer-bottom">
+<div class="composer-left">
+
+<button class="small-btn" id="attachBtn" type="button">
+<span class="material-symbols-rounded" aria-hidden="true">attach_file</span>Attach
+</button>
+
+<button class="small-btn" id="pasteBtn" type="button">
+<span class="material-symbols-rounded" aria-hidden="true">content_paste</span>Paste
+</button>
+
+<span class="counter" id="counter">0 lines · 0 chars</span>
+
+</div>
+
+<div class="composer-right">
+
+<button class="small-btn" id="clearInputBtn" type="button">
+<span class="material-symbols-rounded" aria-hidden="true">clear_all</span>Clear
+</button>
+
+<button class="send-btn" id="sendBtn" type="button" title="Send" aria-label="Send">
+<span class="material-symbols-rounded" aria-hidden="true">arrow_upward</span>
+</button>
+
+</div>
+</div>
+</div>
+</div>
+
+</main>
+</div>
+
+<div class="modal" id="settingsModal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+<div class="modal-card">
+
+<div class="modal-head">
+<div class="modal-title" id="settingsTitle">Gemini Settings</div>
+<button class="icon-btn" id="closeSettings" type="button" aria-label="Close settings">
+<span class="material-symbols-rounded" aria-hidden="true">close</span>
+</button>
+</div>
+
+<div class="modal-body">
+
+<div class="field">
+<label for="apiKeyInput">Gemini API Key</label>
+<input id="apiKeyInput" type="password" autocomplete="off" placeholder="AIza...">
+</div>
+
+<div class="field">
+<label for="systemInput">Power System Role</label>
+<textarea id="systemInput"></textarea>
+</div>
+
+<div class="field">
+<label for="maxTokensInput">Maximum output tokens</label>
+<input id="maxTokensInput" type="number" min="256" max="65536" value="65536">
+</div>
+
+<div class="modal-actions">
+<button class="secondary-btn" id="cancelSettings" type="button">Cancel</button>
+<button class="primary-btn" id="saveSettings" type="button">Save settings</button>
+</div>
+
+</div>
+</div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+import{GoogleGenAI}from"https://esm.sh/@google/genai@latest";
+
+const DEFAULT_MODEL="gemini-3.8-flash",MAX_CODE_LINES=80000,MAX_CODE_CHARS=12000000,DEFAULT_MAX_OUTPUT=65536,DEFAULT_THINKING_LEVEL="medium",STORAGE={apiKey:"gemini_code_studio_api_key",model:"gemini_code_studio_model",thinking:"gemini_code_studio_thinking",system:"gemini_code_studio_system",maxTokens:"gemini_code_studio_max_tokens"},DEFAULT_SYSTEM_ROLE=`
+You are Gemini Code Power Studio, a senior principal software engineer, software architect, security engineer, performance engineer and debugging specialist.
+
+Your primary purpose is to generate, modify, repair, refactor, review, explain, optimize, migrate and architect software.
+
+CORE ENGINEERING RULES
+
+1. Treat supplied source code as authoritative input.
+2. Preserve existing functionality unless the user explicitly requests behavioral changes.
+3. Never silently remove important functionality.
+4. Do not invent APIs, library functions, configuration options, files or dependencies when avoidable.
+5. Prefer production-grade solutions over toy examples.
+6. Consider security, correctness, reliability, performance, scalability, accessibility and maintainability.
+7. Validate assumptions before changing architecture.
+8. Keep unrelated code unchanged during modification tasks.
+9. When modifying existing code, return the complete corrected version when practical rather than incomplete fragments.
+10. Clearly identify important breaking changes.
+11. Do not replace working code with pseudocode unless the user explicitly asks for pseudocode.
+12. Use current stable APIs when possible.
+13. Avoid deprecated APIs when a supported replacement exists.
+14. Handle errors properly.
+15. Avoid unnecessary dependencies.
+16. Never expose secrets in source code unless the user explicitly supplied them for transformation. Recommend environment variables or secure secret storage for production.
+17. When the user asks for a complete script, produce a complete copy-paste-ready script.
+18. Respect the requested language, framework, runtime and platform.
+19. Optimize code only when optimization is technically justified.
+20. For security-sensitive code, identify relevant risks and use safer implementation patterns.
+
+CODE MODIFICATION PROTOCOL
+
+When existing code is supplied:
+
+- Understand the existing architecture first.
+- Identify relevant files/functions/classes.
+- Determine dependencies between affected components.
+- Make the smallest coherent set of changes.
+- Preserve unrelated functionality.
+- Check for syntax errors and obvious runtime problems.
+- Check imports/dependencies.
+- Check edge cases.
+- Check asynchronous behavior and race conditions where relevant.
+- Check resource cleanup.
+- Check security boundaries.
+- Return the resulting implementation.
+
+OUTPUT PROTOCOL
+
+For code-generation or code-modification requests:
+
+1. Give a concise implementation summary.
+2. Give important assumptions only when necessary.
+3. Put executable code inside fenced code blocks.
+4. Use the correct language identifier.
+5. Do not wrap code in unnecessary prose.
+6. Do not truncate important code.
+7. If the requested implementation is very large, organize it logically while keeping it complete.
+8. Never use placeholders such as "rest of code here" when the user requested a complete implementation.
+
+FOR EXISTING CODE:
+
+Do not rewrite unrelated sections merely for stylistic reasons.
+
+FOR DEBUGGING:
+
+Explain:
+- root cause
+- affected area
+- correction
+- corrected implementation
+
+FOR REVIEWS:
+
+Check:
+- correctness
+- security
+- performance
+- reliability
+- maintainability
+- scalability
+- compatibility
+- error handling
+
+FOR GENERATION:
+
+Produce production-oriented code with:
+- clear structure
+- validation
+- error handling
+- comments only where useful
+- sensible defaults
+- secure configuration
+- maintainable naming
+
+The user's explicit request has priority over stylistic preferences, but never invent capabilities that the selected model or runtime does not actually support.
+`.trim();
+
+let ai=null,currentInteractionId=null,isGenerating=false,currentAbortController=null,currentStream=null,conversationMessages=[],selectedFiles=[],activeTab="code";
+
+const $=id=>document.getElementById(id),sidebar=$("sidebar"),sidebarBackdrop=$("sidebarBackdrop"),chat=$("chat"),chatInner=$("chatInner"),welcome=$("welcome"),composer=$("composer"),codeInput=$("codeInput"),promptInput=$("promptInput"),fileInput=$("fileInput"),sendBtn=$("sendBtn"),counter=$("counter"),modelSelect=$("modelSelect"),thinkingSelect=$("thinkingSelect"),modeSelect=$("modeSelect"),settingsModal=$("settingsModal"),apiKeyInput=$("apiKeyInput"),systemInput=$("systemInput"),maxTokensInput=$("maxTokensInput"),statusDot=$("statusDot"),statusText=$("statusText"),toast=$("toast");
+
+const ICONS={send:"arrow_upward",stop:"stop",menu:"menu",close:"close"};
+
+function escapeHTML(value){return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;")}
+function escapeAttribute(value){return escapeHTML(value).replaceAll("\n","&#10;")}
+function showToast(message){toast.textContent=message;toast.classList.add("show");clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>toast.classList.remove("show"),2400)}
+function getLineCount(text){return text?text.split(/\r\n|\r|\n/).length:0}
+function updateCounter(){const text=codeInput.value,lines=getLineCount(text),chars=text.length;counter.textContent=`${lines.toLocaleString()} lines · ${chars.toLocaleString()} chars`;counter.style.color=lines>MAX_CODE_LINES?"#ff6b6b":""}
+function scrollToBottom(){requestAnimationFrame(()=>{chat.scrollTop=chat.scrollHeight})}
+function getApiKey(){return localStorage.getItem(STORAGE.apiKey)||""}
+function updateAPIStatus(){const key=getApiKey();if(key){statusDot.className="status-dot ok";statusText.textContent="API key configured"}else{statusDot.className="status-dot error";statusText.textContent="API key not configured"}}
+function saveConversationTitle(text){const title=text.replace(/\s+/g," ").trim().slice(0,60);if(!title)return;const item=document.createElement("button");item.className="chat-item";item.type="button";item.textContent=title;item.onclick=()=>{closeSidebar();showToast("Conversation history is maintained for the current session.")};$("chatList").prepend(item)}
+function setSendButton(stop){sendBtn.innerHTML=`<span class="material-symbols-rounded" aria-hidden="true">${stop?ICONS.stop:ICONS.send}</span>`;sendBtn.setAttribute("aria-label",stop?"Stop generation":"Send");sendBtn.title=stop?"Stop generation":"Send";sendBtn.classList.toggle("stop",stop)}
+function getThinkingLevel(){const allowed=["low","medium","high"],value=thinkingSelect.value;return allowed.includes(value)?value:DEFAULT_THINKING_LEVEL}
+function updateThinkingLabel(){const level=getThinkingLevel(),labels={low:"🧠 Thinking: Low",medium:"🧠 Thinking: Medium",high:"🧠 Thinking: High"},option=[...thinkingSelect.options].find(item=>item.value===level);if(option)option.textContent=labels[level]}
+function setSidebar(open){const isOpen=!!open;sidebar.classList.toggle("open",isOpen);sidebarBackdrop.classList.toggle("open",isOpen);$("mobileMenuBtn").setAttribute("aria-expanded",String(isOpen));$("mobileMenuBtn").setAttribute("aria-label",isOpen?"Close navigation":"Open navigation");sidebarBackdrop.setAttribute("aria-hidden",String(!isOpen))}
+function closeSidebar(){setSidebar(false)}
+function toggleSidebar(){setSidebar(!sidebar.classList.contains("open"))}
+
+function openSettings(){apiKeyInput.value=getApiKey();systemInput.value=localStorage.getItem(STORAGE.system)||DEFAULT_SYSTEM_ROLE;maxTokensInput.value=localStorage.getItem(STORAGE.maxTokens)||DEFAULT_MAX_OUTPUT;settingsModal.classList.add("open");setTimeout(()=>apiKeyInput.focus(),0)}
+function closeSettings(){settingsModal.classList.remove("open")}
+function saveSettings(){const key=apiKeyInput.value.trim(),system=systemInput.value.trim();let maxTokens=Number(maxTokensInput.value);if(!Number.isFinite(maxTokens))maxTokens=DEFAULT_MAX_OUTPUT;maxTokens=Math.max(256,Math.min(65536,Math.floor(maxTokens)));key?localStorage.setItem(STORAGE.apiKey,key):localStorage.removeItem(STORAGE.apiKey);localStorage.setItem(STORAGE.system,system||DEFAULT_SYSTEM_ROLE);localStorage.setItem(STORAGE.maxTokens,String(maxTokens));ai=key?new GoogleGenAI({apiKey:key}):null;updateAPIStatus();closeSettings();showToast("Settings saved.")}
+
+function newChat(){closeSidebar();currentInteractionId=null;conversationMessages=[];selectedFiles=[];chatInner.innerHTML="";chatInner.appendChild(welcome);welcome.style.display="flex";codeInput.value="";promptInput.value="";updateCounter();autoResizePrompt();saveConversationTitle("New conversation");showToast("New chat started.")}
+function addUserMessage(prompt,code){welcome.style.display="none";const wrapper=document.createElement("div");wrapper.className="message user";const combined=code?`${prompt}\n\n[Attached code]\n${code}`:prompt;wrapper.innerHTML=`<div class="message-body"><div class="message-text">${escapeHTML(combined).replace(/\n/g,"<br>")}</div></div><div class="avatar" aria-hidden="true">U</div>`;chatInner.appendChild(wrapper);scrollToBottom();return wrapper}
+function addAssistantMessage(){const wrapper=document.createElement("div");wrapper.className="message assistant";wrapper.innerHTML=`<div class="avatar" aria-hidden="true">✦</div><div class="message-body"><div class="thinking" id="thinkingStatus">Gemini is thinking…</div><div class="message-text" id="assistantLiveText"></div></div>`;chatInner.appendChild(wrapper);scrollToBottom();return wrapper}
+
+function renderMarkdownBasic(text){const blocks=[],placeholder="\uE000CODEBLOCK";let index=0;const replaced=text.replace(/```([^\n]*)\n([\s\S]*?)```/g,(_,lang,code)=>{const id=`${placeholder}${index++}\uE001`;blocks.push({id,lang:lang.trim()||"code",code});return id});let html=escapeHTML(replaced);html=html.replace(/`([^`\n]+)`/g,'<span class="inline-code">$1</span>');html=html.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");html=html.replace(/\*([^*]+)\*/g,"<em>$1</em>");html=html.replace(/\n/g,"<br>");for(const block of blocks){const codeHTML=escapeHTML(block.code),blockHTML=`<div class="code-wrap"><div class="code-head"><span class="code-lang">${escapeHTML(block.lang)}</span><div class="code-actions"><button class="code-action copy-code" type="button" data-code="${escapeAttribute(block.code)}">Copy</button><button class="code-action download-code" type="button" data-code="${escapeAttribute(block.code)}" data-lang="${escapeAttribute(block.lang)}">Download</button></div></div><pre><code>${codeHTML}</code></pre></div>`;html=html.replace(escapeHTML(block.id),blockHTML)}return html}
+function updateAssistantOutput(element,text){element.innerHTML=renderMarkdownBasic(text);bindCodeActions(element);scrollToBottom()}
+function bindCodeActions(root){root.querySelectorAll(".copy-code").forEach(btn=>{btn.onclick=async()=>{try{await navigator.clipboard.writeText(btn.dataset.code);showToast("Code copied.")}catch{showToast("Clipboard access failed.")}}});root.querySelectorAll(".download-code").forEach(btn=>{btn.onclick=()=>downloadCode(btn.dataset.code,btn.dataset.lang)})}
+function extensionFromLanguage(language){const map={javascript:"js",js:"js",typescript:"ts",ts:"ts",python:"py",py:"py",java:"java",kotlin:"kt",swift:"swift",c:"c",cpp:"cpp","c++":"cpp",csharp:"cs","c#":"cs",php:"php",ruby:"rb",go:"go",rust:"rs",html:"html",css:"css",scss:"scss",sql:"sql",json:"json",xml:"xml",yaml:"yaml",yml:"yml",bash:"sh",shell:"sh",sh:"sh",powershell:"ps1",ps1:"ps1",dart:"dart",lua:"lua",r:"r",jsx:"jsx",tsx:"tsx",vue:"vue",svelte:"svelte"};return map[language.toLowerCase().trim()]||"txt"}
+function downloadCode(code,language){const extension=extensionFromLanguage(language),blob=new Blob([code],{type:"text/plain;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`gemini-code.${extension}`;document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url)}
+
+async function processFiles(files){for(const file of files){try{const text=await file.text();selectedFiles.push({name:file.name,text});codeInput.value+=(codeInput.value?"\n\n":"")+`// ===== FILE: ${file.name} =====\n`+text}catch(error){console.error("File read error:",error)}}updateCounter();if(files.length)showToast(`${files.length} file(s) loaded.`)}
+function getTaskInstruction(){const mode=modeSelect.value,labels={generate:"Generate the requested implementation.",modify:"Modify the supplied code according to the requested changes. Preserve unrelated functionality.",debug:"Debug the supplied code. Find root causes, correct them, and provide the corrected implementation.",refactor:"Refactor the supplied code for production quality while preserving intended behavior.",review:"Perform a deep engineering review covering correctness, security, performance, reliability and maintainability.",explain:"Explain the supplied code clearly and accurately. Do not modify it unless explicitly requested.",optimize:"Optimize the supplied code while preserving correctness and intended behavior.",convert:"Convert the supplied code to the requested target language, framework or architecture while preserving functionality."};return labels[mode]||labels.generate}
+function buildPrompt(){const prompt=promptInput.value.trim(),code=codeInput.value;if(code.length>MAX_CODE_CHARS)throw new Error(`Code input exceeds ${MAX_CODE_CHARS.toLocaleString()} characters.`);const lines=getLineCount(code);if(lines>MAX_CODE_LINES)throw new Error(`Code input exceeds the ${MAX_CODE_LINES.toLocaleString()} line limit.`);const task=getTaskInstruction();let finalPrompt=`${task}\n\n`;if(prompt)finalPrompt+=`USER REQUEST:\n${prompt}\n\n`;if(code)finalPrompt+=`SUPPLIED SOURCE CODE:\n\n`+"```text\n"+code+"\n```\n\n";if(!prompt&&!code)finalPrompt+="The user has not supplied enough information. Ask for the missing requirements.";finalPrompt+=`\nIMPORTANT:\n- Follow the Power System Role.\n- Analyze the complete supplied code before changing it.\n- Do not omit unrelated functionality.\n- If this is a modification request, return a complete corrected implementation when practical.\n- Put executable code inside fenced code blocks.\n- Do not use "..." or "rest of code" placeholders when a complete implementation is requested.\n`;return finalPrompt}
+function ensureClient(){const key=getApiKey();if(!key){openSettings();throw new Error("Configure your Gemini API key first.")}if(!ai)ai=new GoogleGenAI({apiKey:key});return ai}
+
+async function generate(){
+if(isGenerating)return;
+let request;
+try{request=buildPrompt()}catch(error){showToast(error.message);return}
+try{
+const client=ensureClient(),userCode=codeInput.value.trim();
+addUserMessage(promptInput.value.trim()||getTaskInstruction(),userCode);
+if(conversationMessages.length===0)saveConversationTitle(promptInput.value.trim()||getTaskInstruction());
+conversationMessages.push({role:"user",content:request});
+promptInput.value="";autoResizePrompt();
+const assistant=addAssistantMessage(),liveText=assistant.querySelector("#assistantLiveText"),thinkingStatus=assistant.querySelector("#thinkingStatus");
+isGenerating=true;currentAbortController=new AbortController();currentStream=null;setSendButton(true);
+const model=modelSelect.value,thinking=getThinkingLevel(),systemInstruction=localStorage.getItem(STORAGE.system)||DEFAULT_SYSTEM_ROLE;
+const maxOutputTokens=Number(localStorage.getItem(STORAGE.maxTokens)||DEFAULT_MAX_OUTPUT);
+const requestConfig={model,input:request,system_instruction:systemInstruction,generation_config:{thinking_level:thinking,max_output_tokens:Math.min(65536,Math.max(256,maxOutputTokens))},stream:true,store:true};
+if(currentInteractionId)requestConfig.previous_interaction_id=currentInteractionId;
+thinkingStatus.textContent=`Gemini ${model} · thinking ${thinking}…`;
+let outputText="";
+currentStream=await client.interactions.create(requestConfig);
+
+for await(const event of currentStream){
+if(currentAbortController?.signal.aborted)break;
+if(event?.event_type==="step.delta"){
+const delta=event.delta;
+if(delta?.type==="text"){outputText+=delta.text||"";thinkingStatus.style.display="none";updateAssistantOutput(liveText,outputText)}
+if(delta?.type==="thought_summary")thinkingStatus.textContent="Gemini is reasoning…";
+}
+if((event?.event_type==="interaction.created"||event?.event_type==="interaction.completed"||event?.event_type==="interaction.complete")&&event.interaction?.id)currentInteractionId=event.interaction.id;
+if(event?.interaction?.id)currentInteractionId=event.interaction.id;
+if(event?.id&&typeof event.id==="string"&&event.id.startsWith("int_"))currentInteractionId=event.id;
+}
+
+if(!outputText.trim()&&!currentAbortController?.signal.aborted){
+try{
+if(currentInteractionId&&client.interactions.get){
+const finalInteraction=await client.interactions.get(currentInteractionId);
+outputText=finalInteraction?.output_text||"";
+if(outputText)updateAssistantOutput(liveText,outputText);
+}
+}catch(fallbackError){console.warn("Final interaction read failed:",fallbackError)}
+}
+
+if(!outputText.trim()&&!currentAbortController?.signal.aborted)liveText.textContent="Gemini returned no text output.";
+conversationMessages.push({role:"assistant",content:outputText});
+thinkingStatus.style.display="none";
+}catch(error){
+console.error("Gemini error:",error);
+if(currentAbortController?.signal.aborted)return;
+const message=error?.message||String(error),errorBox=document.createElement("div");
+errorBox.className="message assistant";
+errorBox.innerHTML=`<div class="avatar" aria-hidden="true">!</div><div class="message-body"><div class="message-text"><strong>Gemini request failed</strong><br><br>${escapeHTML(message)}</div></div>`;
+chatInner.appendChild(errorBox);scrollToBottom();showToast("Gemini request failed.");
+}finally{
+isGenerating=false;currentAbortController=null;currentStream=null;setSendButton(false);
+}
+}
+
+function stopGeneration(){
+if(!isGenerating)return;
+try{currentAbortController?.abort();currentStream?.return?.()}catch(error){console.debug("Stream stop:",error)}
+isGenerating=false;setSendButton(false);showToast("Generation stopped.");
+}
+function autoResizePrompt(){promptInput.style.height="auto";promptInput.style.height=Math.min(125,promptInput.scrollHeight)+"px"}
+
+function setTab(tab){activeTab=tab;document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));if(tab==="code"){$("codeTab").classList.add("active");codeInput.style.display="";codeInput.placeholder="Paste your code here — up to 80,000 lines."}else if(tab==="text"){$("textTab").classList.add("active");codeInput.style.display="";codeInput.placeholder="Paste documentation, requirements, logs or text here."}else{$("fileTab").classList.add("active");codeInput.style.display="";codeInput.placeholder="Attach files using the + Attach button."}resizeComposerSpace()}
+
+function resizeComposerSpace(){const h=composer.getBoundingClientRect().height;document.documentElement.style.setProperty("--composer-space",`${Math.ceil(h+24)}px`)}
+const composerResizeObserver=new ResizeObserver(resizeComposerSpace);composerResizeObserver.observe(composer);
+
+codeInput.addEventListener("input",updateCounter);
+promptInput.addEventListener("input",()=>{autoResizePrompt();resizeComposerSpace()});
+promptInput.addEventListener("keydown",event=>{if(event.key==="Enter"&&!event.shiftKey){event.preventDefault();generate()}});
+sendBtn.onclick=()=>isGenerating?stopGeneration():generate();
+$("attachBtn").onclick=()=>fileInput.click();
+$("fileTab").onclick=()=>{setTab("file");fileInput.click()};
+fileInput.addEventListener("change",event=>processFiles([...event.target.files]));
+$("pasteBtn").onclick=async()=>{try{const text=await navigator.clipboard.readText();codeInput.value=text;updateCounter();resizeComposerSpace();showToast("Clipboard pasted.")}catch{showToast("Clipboard permission denied.")}};
+$("clearInputBtn").onclick=()=>{codeInput.value="";promptInput.value="";selectedFiles=[];updateCounter();autoResizePrompt();resizeComposerSpace()};
+$("newChatBtn").onclick=newChat;
+$("clearBtn").onclick=()=>{closeSidebar();currentInteractionId=null;conversationMessages=[];chatInner.innerHTML="";chatInner.appendChild(welcome);welcome.style.display="flex";showToast("Conversation cleared.")};
+$("settingsBtn").onclick=openSettings;
+$("settingsTopBtn").onclick=openSettings;
+$("closeSettings").onclick=closeSettings;
+$("cancelSettings").onclick=closeSettings;
+$("saveSettings").onclick=saveSettings;
+$("mobileMenuBtn").onclick=toggleSidebar;
+sidebarBackdrop.onclick=closeSidebar;
+$("codeTab").onclick=()=>setTab("code");
+$("textTab").onclick=()=>setTab("text");
+
+modelSelect.addEventListener("change",()=>localStorage.setItem(STORAGE.model,modelSelect.value));
+thinkingSelect.addEventListener("change",()=>{const level=getThinkingLevel();localStorage.setItem(STORAGE.thinking,level);updateThinkingLabel()});
+
+document.querySelectorAll(".suggestion").forEach(button=>{button.onclick=()=>{promptInput.value=button.dataset.prompt;autoResizePrompt();resizeComposerSpace();promptInput.focus();closeSidebar()}});
+
+document.addEventListener("dragover",event=>event.preventDefault());
+document.addEventListener("drop",event=>{event.preventDefault();const files=[...(event.dataTransfer?.files||[])];if(files.length)processFiles(files)});
+
+document.addEventListener("keydown",event=>{
+if((event.ctrlKey||event.metaKey)&&event.key==="Enter"){event.preventDefault();isGenerating?stopGeneration():generate()}
+if(event.key==="Escape"){
+if(settingsModal.classList.contains("open")){closeSettings();return}
+if(sidebar.classList.contains("open")){closeSidebar();return}
+if(isGenerating)stopGeneration();
+}
+});
+
+$("main")?.addEventListener("click",()=>{if(window.matchMedia("(max-width:800px)").matches&&sidebar.classList.contains("open"))closeSidebar()});
+
+window.addEventListener("resize",()=>{resizeComposerSpace();if(window.innerWidth>800)closeSidebar()});
+window.visualViewport?.addEventListener("resize",()=>requestAnimationFrame(resizeComposerSpace));
+window.visualViewport?.addEventListener("scroll",()=>requestAnimationFrame(resizeComposerSpace));
+
+function init(){
+const savedKey=localStorage.getItem(STORAGE.apiKey),savedModel=localStorage.getItem(STORAGE.model),savedThinking=localStorage.getItem(STORAGE.thinking);
+if(savedModel){const option=[...modelSelect.options].find(o=>o.value===savedModel);if(option)modelSelect.value=savedModel}
+if(savedThinking){const option=[...thinkingSelect.options].find(o=>o.value===savedThinking);if(option)thinkingSelect.value=savedThinking}else thinkingSelect.value=DEFAULT_THINKING_LEVEL;
+updateThinkingLabel();
+if(savedKey)ai=new GoogleGenAI({apiKey:savedKey});
+updateAPIStatus();updateCounter();autoResizePrompt();requestAnimationFrame(resizeComposerSpace);
+window.addEventListener("beforeunload",event=>{if(codeInput.value.length>100000){event.preventDefault();event.returnValue=""}});
+}
+init();
+</script>
+</body>
+</html>
